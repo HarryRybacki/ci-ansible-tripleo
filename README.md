@@ -37,14 +37,29 @@ Images containg RDO binaries for the OpenStack Mitaka release are used by defaul
 * https://ci.centos.org/artifacts/rdo/images/${RELEASE}/delorean/stable/undercloud.qcow2
 * "--undercloud-image-url"  causes release to be ignored and uses a specific image.
 
-The deploy.sh script first prepares and activates the virtualenv and installs the following roles via "pip install -U -r requirements.txt"
+The deploy.sh script first prepares and activates the virtualenv and installs roles via "pip install -U -r requirements.txt"
+Please refer to requirements.txt for details.  You will also find other requirements files that fullfill other needs as well.
+
+Here is the list of avaialable roles for c.a.t that have been validated.
 
 * https://git.openstack.org/openstack/tripleo-quickstart
-* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud.git#egg=ansible-role-tripleo-overcloud
-* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud-validate.git#egg=ansible-role-tripleo-overcloud-validate
-* https://github.com/redhat-openstack/ansible-role-tripleo-tempest.git#egg=ansible-role-tripleo-tempest
-* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud-upgrade.git#egg=ansible-role-tripleo-overcloud-upgrade
-* https://github.com/redhat-openstack/ansible-role-tripleo-undercloud-post.git/#egg=ansible-role-tripleo-undercloud-post
+* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud-validate.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-tempest.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-undercloud-post.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-inventory.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-image-build.git
+
+
+Here is a list of available roles for c.a.t that are currently under development
+
+* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud-upgrade.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-ssl.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-scale-nodes.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-collect-logs.git
+* https://github.com/redhat-openstack/ansible-role-tripleo-overcloud-validate-ha.git
+
+
 
 After setting up ssh.config.ansible and sourcing the env defined in the file "ansible_env" the script wraps an invocation of an Ansible playbook (playbooks/tripleo.yml).  Any playbook can be executed instead of tripleo.yml via --playbook.
 
