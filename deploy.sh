@@ -34,6 +34,7 @@ setup() {
         git checkout --quiet origin/master
     fi
 
+    python setup.py install
     pip install -r $REQUIREMENTS
 }
 
@@ -134,7 +135,7 @@ while [ "x$1" != "x" ]; do
 done
 
 if [ "$OPT_CLONE" != 1 ]; then
-    CAT_DIR=.
+    CAT_DIR=$OPT_WORKDIR
 else
     CAT_DIR=$OPT_WORKDIR/ci-ansible-tripleo
 fi
@@ -200,6 +201,7 @@ fi
 echo "Installing OpenStack ${RELEASE:+"$RELEASE "}on host $VIRTHOST"
 echo "Executing Ansible..."
 set -x
+
 ansible-playbook -$VERBOSITY $CAT_DIR/playbooks/$PLAYBOOK.yml \
     --skip-tags "undercloud-post-install" \
     -e @$OPT_CONFIG \

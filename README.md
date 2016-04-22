@@ -73,9 +73,15 @@ ansible-playbook -vv playbooks/$PLAYBOOK.yml \
     -e image_url=$OPT_UNDERCLOUD_URL \
     -e local_working_dir=$OPT_WORKDIR \
     -e virthost=$VIRTHOST \
-    -e delorean_hash=$BUILD \
     $EXTRA_VARS_FILE
 ```
+
+# Sample invocations
+
+./deploy.sh -c -r liberty my-testbox
+./deploy.sh -c -r mitaka my-testbox
+./deploy.sh -c -r rhos-7.0.4 -f .cat/config/7-director/net-iso.yml my-testbox
+./deploy.sh -c -r rhos-8.0.0  my-testbox
 
 # How to contribute
 

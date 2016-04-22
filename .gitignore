@@ -3,3 +3,5 @@ ansible.cfg*
 .idea/*
 .cat
 config/rhos*
+.egg*
+*egg*
