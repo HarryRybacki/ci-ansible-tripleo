@@ -1,7 +1,7 @@
 ---
 - include: tripleo.yml
 
-- name:  Upgrade the overcloud
+- name:  Upgrade Tripleo
   hosts: undercloud
   gather_facts: no
   roles:
