@@ -205,7 +205,7 @@ set -x
 ansible-playbook -$VERBOSITY $CAT_DIR/playbooks/$PLAYBOOK.yml \
     --skip-tags "undercloud-post-install" \
     -e @$OPT_CONFIG \
-    -e @config/$RELEASE.yml \
+    -e @$CAT_DIR/config/$RELEASE.yml \
     -e ansible_python_interpreter=/usr/bin/python \
     -e local_working_dir=$OPT_WORKDIR \
     -e virthost=$VIRTHOST \
