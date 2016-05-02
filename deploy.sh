@@ -11,7 +11,15 @@ clean_virtualenv() {
 }
 
 install_deps () {
-    yum -y install git virtualenv gcc libyaml
+  #check the version of yum we are dealing with, this will
+  #let us know if its a bash redirect script of the real yum.
+  head -1 /usr/bin/yum|grep python > /dev/null 2>&1
+
+  if [ $? == 0 ]; then
+    yum -y install git virtualenv gcc libyaml libffi-devel
+  else
+    dnf -y install git virtualenv gcc libyaml libffi-devel
+  fi
 }
 
 setup() {
