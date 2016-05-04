@@ -19,3 +19,8 @@ pingtest: true
 public_network_type: vlan
 public_physical_network: datacentre
 public_segmentation_id: 10
+# overcloud network config
+floating_ip_cidr: 172.16.23.0/24
+public_net_pool_start: 172.16.23.40
+public_net_pool_end: 172.16.23.50
+public_net_gateway: 172.16.23.1
