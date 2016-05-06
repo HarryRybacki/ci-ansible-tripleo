@@ -1,4 +1,5 @@
 pbr>=1.6
+setuptools>=11.3
 ansible==2.0.1
 git+https://git.openstack.org/openstack/tripleo-quickstart#egg=tripleo-quickstart
 git+https://github.com/redhat-openstack/ansible-role-tripleo-overcloud.git#egg=ansible-role-tripleo-overcloud
