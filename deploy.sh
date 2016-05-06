@@ -150,7 +150,7 @@ fi
 
 # Set this default after option processing, because the default depends
 # on another option.
-: ${OPT_CONFIG:=$CAT_DIR/config/net-iso.yml}
+: ${OPT_CONFIG:=$CAT_DIR/config/general_config/net-iso.yml}
 
 if [ "$OPT_INSTALL_DEPS" = 1 ]; then
     echo "NOTICE: installing dependencies (git, virtualenv, gcc, libyaml)"
@@ -213,7 +213,7 @@ set -x
 ansible-playbook -$VERBOSITY $CAT_DIR/playbooks/$PLAYBOOK.yml \
     --skip-tags "undercloud-post-install" \
     -e @$OPT_CONFIG \
-    -e @$CAT_DIR/config/$RELEASE.yml \
+    -e @$CAT_DIR/config/release/$RELEASE.yml \
     -e ansible_python_interpreter=/usr/bin/python \
     -e local_working_dir=$OPT_WORKDIR \
     -e virthost=$VIRTHOST \
