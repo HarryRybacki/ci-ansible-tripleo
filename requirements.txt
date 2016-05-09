@@ -9,6 +9,7 @@ git+https://github.com/redhat-openstack/ansible-role-tripleo-tempest.git#egg=ans
 git+https://github.com/redhat-openstack/ansible-role-tripleo-overcloud-upgrade.git#egg=ansible-role-tripleo-overcloud-upgrade
 git+https://github.com/redhat-openstack/ansible-role-tripleo-inventory.git#egg=ansible-role-tripleo-inventory
 git+https://github.com/redhat-openstack/ansible-role-tripleo-undercloud-post.git/#egg=ansible-role-tripleo-undercloud-post
+git+https://github.com/redhat-openstack/ansible-role-tripleo-cleanup-nfo.git/#egg=ansible-role-tripleo-cleanup-nfo
 
 #to pull in local development changes
 #file:///<dir>/ansible-role-tripleo-overcloud-validate/#egg=ansible-role-tripleo-overcloud-validate
