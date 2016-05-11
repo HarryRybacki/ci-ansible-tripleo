@@ -43,7 +43,7 @@ setup() {
     fi
 
     python setup.py install
-    pip install -r $REQUIREMENTS
+    pip install --no-cache-dir -r $REQUIREMENTS
 }
 
 
