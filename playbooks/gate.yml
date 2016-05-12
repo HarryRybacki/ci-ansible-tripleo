@@ -1,6 +1,12 @@
 ---
 - include: provision.yml
 
+- name: Build gated RPMs
+  hosts: virthost
+  gather_facts: no
+  roles:
+    - ansible-role-tripleo-gate
+
 - name:  Setup undercloud and baremetal vms and networks in libvirt
   hosts: virthost
   gather_facts: yes
