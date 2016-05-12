@@ -4,8 +4,10 @@ DEFAULT_OPT_TAGS="untagged,provision,environment,undercloud-scripts,overcloud-sc
 
 : ${OPT_BOOTSTRAP:=0}
 : ${OPT_SYSTEM_PACKAGES:=0}
-: ${OPT_WORKDIR:=$HOME/.quickstart}
+: ${OPT_WORKDIR:=$PWD/.quickstart}
 : ${OPT_TAGS:=$DEFAULT_OPT_TAGS}
+: ${REQUIREMENTS:=requirements.txt}
+: ${PLAYBOOK:=tripleo.yml}
 
 install_deps () {
     yum -y install \
@@ -81,13 +83,13 @@ bootstrap () {
     . $OPT_WORKDIR/bin/activate
 
     if [ "$OPT_NO_CLONE" != 1 ]; then
-        if ! [ -d "$OPT_WORKDIR/tripleo-quickstart" ]; then
-            echo "Cloning tripleo-quickstart repository..."
-            git clone https://github.com/openstack/tripleo-quickstart.git \
-                $OPT_WORKDIR/tripleo-quickstart
+        if ! [ -d "$OPT_WORKDIR/ci-ansible-tripleo" ]; then
+            echo "Cloning ci-ansible-tripleo repository..."
+            git clone https://github.com/redhat-openstack/ci-ansible-tripleo.git \
+                $OPT_WORKDIR/ci-ansible-tripleo
         fi
 
-        cd $OPT_WORKDIR/tripleo-quickstart
+        cd $OPT_WORKDIR/ci-ansible-tripleo
         if [ -n "$OPT_GERRIT" ]; then
             git review -d "$OPT_GERRIT"
         else
@@ -95,8 +97,8 @@ bootstrap () {
             git checkout --quiet origin/master
         fi
     fi
-
-    pip install -r requirements.txt
+    python setup.py install
+    pip install -r $REQUIREMENTS
     )
 }
 
@@ -112,7 +114,6 @@ usage () {
     echo "    --ansible-debug"
     echo "    --bootstrap"
     echo "    --working-dir <directory>"
-    echo "    --undercloud-image-url <url>"
     echo "    --tags <tag1>[,<tag2>,...]"
     echo "    --skip-tags <tag1>,[<tag2>,...]"
     echo "    --config <file>"
@@ -147,11 +148,6 @@ while [ "x$1" != "x" ]; do
             shift
             ;;
 
-        --undercloud-image-url|-u)
-            OPT_UNDERCLOUD_URL=$2
-            shift
-            ;;
-
         --tags|-t)
             OPT_TAGS=$2
             shift
@@ -159,6 +155,21 @@ while [ "x$1" != "x" ]; do
 
         --skip-tags)
             OPT_SKIP_TAGS=$2
+            shift
+            ;;
+
+        --playbook|-p)
+            PLAYBOOK=$2
+            shift
+            ;;
+
+        --requirements|-z)
+            REQUIREMENTS=$2
+            shift
+            ;;
+
+        --release|-r)
+            RELEASE=$2
             shift
             ;;
 
@@ -218,15 +229,9 @@ if [ "$PRINT_LOGO" = 1 ]; then
 fi
 
 
-if [ "$OPT_NO_CLONE" = 1 ]; then
-    OOOQ_DIR=.
-else
-    OOOQ_DIR=$OPT_WORKDIR/tripleo-quickstart
-fi
-
 # Set this default after option processing, because the default depends
 # on another option.
-: ${OPT_CONFIG:=$OOOQ_DIR/playbooks/centosci/minimal.yml}
+: ${OPT_CONFIG:=$OPT_WORKDIR/config/general_config/minimal.yml}
 
 if [ "$OPT_INSTALL_DEPS" = 1 ]; then
     echo "NOTICE: installing dependencies"
@@ -246,27 +251,16 @@ if [ "$#" -gt 2 ]; then
 fi
 
 VIRTHOST=$1
-RELEASE=$2
 
 # We use $RELEASE to build the undercloud image URL. It is also passed to the
 # quickstart playbook, since there are now some version specific behaviors.
 # If the user has provided an explicit URL, we should warn them of that
 # fact.
-if [ -z "$RELEASE" ] && [ -n "$OPT_UNDERCLOUD_URL" ]; then
+if [ -z "$RELEASE" ]; then
 
     RELEASE=mitaka
 
-    echo "WARNING: The release defaults to $RELEASE, but you have" >&2
-    echo "         provided an explicit undercloud image URL. If" >&2
-    echo "         that image is not for $RELEASE, this may not work" >&2
-
-elif [ -z "$RELEASE" ] && [ -z "$OPT_UNDERCLOUD_URL" ]; then
-    RELEASE=mitaka
 fi
-
-# we use this only if --undercloud-image-url was not provided on the
-# command line.
-: ${OPT_UNDERCLOUD_URL:=http://artifacts.ci.centos.org/artifacts/rdo/images/${RELEASE}/delorean/stable/undercloud.qcow2}
 
 print_logo
 echo "Installing OpenStack ${RELEASE:+"$RELEASE "}on host $VIRTHOST"
@@ -287,7 +281,6 @@ activate_venv
 
 set -ex
 
-export ANSIBLE_CONFIG=$OOOQ_DIR/ansible.cfg
 export ANSIBLE_INVENTORY=$OPT_WORKDIR/hosts
 
 # Clear out inventory file to avoid tripping over data
@@ -302,19 +295,29 @@ if [ "$VIRTHOST" = "localhost" ]; then
     echo "localhost ansible_connection=local" >> $ANSIBLE_INVENTORY
 fi
 
+if [ ! -f $OPT_WORKDIR/ssh.config.ansible ] || [ `grep --quiet "Host $VIRTHOST" $OPT_WORKDIR/ssh.config.ansible` ]; then
+cat <<EOF >> $OPT_WORKDIR/ssh.config.ansible
+Host $VIRTHOST
+    User root
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null
+EOF
+fi
+
 if [ "$OPT_DEBUG_ANSIBLE" = 1 ]; then
     VERBOSITY=vvvv
 else
     VERBOSITY=vv
 fi
 
-ansible-playbook -$VERBOSITY $OOOQ_DIR/playbooks/quickstart.yml \
+source ansible_env
+
+ansible-playbook -$VERBOSITY $OPT_WORKDIR/playbooks/$PLAYBOOK \
     -e @$OPT_CONFIG \
     -e ansible_python_interpreter=/usr/bin/python \
-    -e image_url=$OPT_UNDERCLOUD_URL \
     -e local_working_dir=$OPT_WORKDIR \
+    -e @$OPT_WORKDIR/config/release/$RELEASE.yml \
     -e virthost=$VIRTHOST \
-    -e release=$RELEASE \
     ${OPT_VARS[@]} \
     ${OPT_TAGS:+-t $OPT_TAGS} \
     ${OPT_SKIP_TAGS:+--skip-tags $OPT_SKIP_TAGS}
