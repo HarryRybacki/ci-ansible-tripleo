@@ -5,3 +5,4 @@ ansible.cfg*
 config/rhos*
 .egg*
 *egg*
+.quickstart
