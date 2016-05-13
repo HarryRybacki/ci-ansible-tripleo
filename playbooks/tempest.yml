@@ -1,0 +1,7 @@
+---
+
+- name: Execute tempest tests
+  hosts: undercloud
+  roles:
+    - ansible-role-tripleo-tempest
+
