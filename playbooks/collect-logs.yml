@@ -1,4 +1,9 @@
 ---
+- name: Rebuild the inventory
+  hosts: undercloud
+  gather_facts: no
+  roles:
+    - ansible-role-tripleo-inventory
 
 - name: Collect logs and debug data
   hosts: all:!localhost:!virthost
