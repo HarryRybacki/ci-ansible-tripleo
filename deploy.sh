@@ -57,7 +57,7 @@ usage() {
     echo "   -z, --requirements <file>     default: 'requirements.txt', Specify the python setup tools requirements file."
     echo "   -r, --release <release>       default: 'mitaka', Specify version of OpenStack to deploy. "
     echo "   -f, --config-file <file>      select config file, default is config/net-iso.yml"
-    echo "   -e, --extra-vars <file>       Additional Ansible variables.  Supports multiple ('-e f1 -e f2')"
+    echo "   -e, --extra-vars <k=v>, @file Additional Ansible variable.  Supports multiple ('-e name1=val1 -e @file')"
     echo ""
     echo " * Advanced options"
     echo "   -w, --working-dir <directory> Location of ci-ansible-tripleo sources and virtual env"
@@ -94,8 +94,9 @@ while [ "x$1" != "x" ]; do
             shift
             ;;
 
+       # note: for individual -e values.  to pass a file use '-e @file'
         --extra-vars|-e)
-            EXTRA_VARS_FILE="$EXTRA_VARS_FILE-e @$2 "
+            EXTRA_VARS+=(" -e $2")
             shift
             ;;
 
@@ -217,4 +218,5 @@ ansible-playbook -$VERBOSITY $CAT_DIR/playbooks/$PLAYBOOK.yml \
     -e ansible_python_interpreter=/usr/bin/python \
     -e local_working_dir=$OPT_WORKDIR \
     -e virthost=$VIRTHOST \
-    $EXTRA_VARS_FILE
+    ${EXTRA_VARS[@]}
+
